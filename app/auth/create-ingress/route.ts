@@ -5,13 +5,13 @@ import { IngressInput, IngressClient, RoomServiceClient, CreateIngressOptions } 
 import { createClient } from '@/utils/supabase/server';
 
 const roomService = new RoomServiceClient(
-    'https://longday-8bvfj3k1.livekit.cloud',
+    'https://longday-skuxnh08.livekit.cloud',
     process.env.LIVEKIT_API_KEY!,
     process.env.LIVEKIT_API_SECRET!
 );
 
 const ingressClient = new IngressClient(
-    'https://longday-8bvfj3k1.livekit.cloud',
+    'https://longday-skuxnh08.livekit.cloud',
     process.env.LIVEKIT_API_KEY!,
     process.env.LIVEKIT_API_SECRET!
 );
@@ -38,15 +38,20 @@ export async function POST(request: NextRequest) {
     const supabase = createClient();
     const { data, error } = await supabase.auth.getUser();
 
-    if (!data.user) return NextResponse.json({ message: 'Not logged in' }, { status: 403 });
+    console.log(data)
+
+    if (!data.user) {
+        return NextResponse.json({ message: 'Not logged in' }, { status: 403 });
+    }
 
     await resetIngresses(data.user.id);
 
     const options: CreateIngressOptions = {
         name: data.user.user_metadata.username,
-        roomName: data.user.id,
-        participantIdentity: data.user.id,
-        participantName: data.user.user_metadata.username
+        roomName: data.user.user_metadata.username,
+        participantName: data.user.user_metadata.username,
+        participantIdentity: data.user.user_metadata.username,
+        bypassTranscoding: true
     };
 
     const ingress = await ingressClient.createIngress(
@@ -55,7 +60,7 @@ export async function POST(request: NextRequest) {
     );
 
     // Store the new stream key in Supabase
-    const { data: updateData, error: updateError } = await supabase.rpc('store_or_update_stream_key', {
+    const { error: updateError } = await supabase.rpc('store_or_update_stream_key', {
         key: ingress.streamKey,
         user_id: data.user.id
     });
@@ -69,5 +74,5 @@ export async function POST(request: NextRequest) {
 }
 
 export async function GET(request: NextRequest) {
-    return NextResponse.json({ message: 'Welp. You shouldnt be here. Please dont be here. Just leave. I will send Joe after you. Your ip has been logged (no it hasnt)' });
+    return NextResponse.json({ message: 'Unauthorized access' }, { status: 403 });
 }

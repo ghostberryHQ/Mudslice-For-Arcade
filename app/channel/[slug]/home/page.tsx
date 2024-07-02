@@ -63,7 +63,7 @@ export default async function PrivatePage({ params: { slug } }: PageProps) {
             <Input id="streamTitle" name="streamTitle" placeholder="Title" />
             <Label className="text-md font-medium text-neutral-500 dark:text-neutral-400 -mb-3">Stream Genre</Label>
             <Input id="streamGenre" name="streamGenre" placeholder="Stream Genre" />
-            <Button type="submit" className="mt-2 bg-[#21b0c0] text-background dark:bg-[#3fcfde]">
+            <Button type="submit" className="mt-2 bg-[#21b0c0] text-background hover:bg-[#3fcfde]">
               Update Stream Info
             </Button>
           </form>
